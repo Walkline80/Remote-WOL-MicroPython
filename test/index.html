@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta http-equiv="Expires" content="0">
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+		<meta http-equiv="Cache" content="no-cache">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title>ESP32 Smart Config</title>
+		<!-- <link rel="stylesheet" href="./css/main.css"> -->
+		<!-- <link rel="stylesheet" href="./css/fake-bs.css"> -->
+	</head>
+	<body>
+		<h1>ESP32 Smart Config</h1>
+		<div class="main">
+		<div class="container">
+			<div class="row">
+				<div class="header" style="padding-top: 0px;">
+					<span>Setup Your Wifi</span>
+				</div>
+				<div class="content">
+					<!-- <select>
+						<option>Select</option>
+					</select> -->
+					<input id="ws_addr" type="text" placeholder="" autocomplete="new-password" value="192.168.66.1" />
+					<button id="button_connect">Connect</button>
+				</div>
+			</div>
+			<div class="row">
+				<div class="header">
+					<span>MQTT Client Setup</span>
+				</div>
+				<div class="content">
+					<div class="input-group">
+						<button id="button_identity">Identity</button>
+					</div>
+				</div>
+				<div>
+					<div class="input-group">
+						<input id="mqtt_keepalive" class="form-control" type="text" placeholder="KeepAlive: eg. 100" value="10" />
+						<input id="mqtt_path" class="form-control" type="text" placeholder="Path: eg. /" value="/" />
+					</div>
+					<input id="mqtt_username" type="text" placeholder="Username" autocomplete="new-password" />
+					<input id="mqtt_device_number" type="text" placeholder="Device Number" autocomplete="new-password" />
+					<input id="mqtt_device_authorize" type="password" placeholder="Device Authorize" autocomplete="new-password" />
+					<input id="mqtt_device_name" type="text" placeholder="Device Name" />
+					<input id="mqtt_data_point" type="text" placeholder="Data Point: eg. temperature,humidity" />
+				</div>
+			</div>
+			<!-- <div class="row">
+				<div class="content">
+					<div class="input-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text">Host</span>
+						</div>
+						<input type="text" class="form-control" />
+					</div>
+				</div>
+			</div> -->
+			<div class="row">
+				<div class="content">
+					<div id="output" class="output"></div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="content">
+					<div class="button-group footer">
+						<a id="button_save" class="button left percent-65 button-normal">Save</a>
+						<a id="button_test" class="button right percent-30 button-info">Test</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+	</body>
+
+	<script src="./js/index.js"></script>
+</html>
