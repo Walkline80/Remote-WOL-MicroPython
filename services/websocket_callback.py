@@ -4,13 +4,13 @@ Copyright © 2021 Walkline Wang (https://walkline.wang)
 https://gitee.com/walkline/remote-wol-micropython
 """
 import gc
-from config import Config
 from utils.utilities import Utilities
 from utils.wifihandler import WifiHandler
-
+from config import Config
 
 class WebSocketCallback(object):
-	def _OnWebSocketTextMsg(webSocket, msg) :
+	def _OnWebSocketTextMsg(webSocket, msg):
+		global Utilities, WifiHandler, Config
 		import ujson
 
 		print('WebSocket text message: %s' % msg)
@@ -22,25 +22,18 @@ class WebSocketCallback(object):
 			if params["command"] == "identity":
 				from utils.json_const import identity_result
 
-				hardware_version = Config.HARDWARE_VERSION
-				hardware_name = Config.HARDWARE_NAME
-				mac_address = Utilities.get_chip_id()
-				ip_address = WifiHandler.get_ip_address()
-				
 				identity_result.update(
-					hardware_version = hardware_version,
-					hardware_name = hardware_name,
-					mac_address = mac_address,
-					ip_address = ip_address
+					hardware_version = Config.HARDWARE_VERSION,
+					hardware_name = Config.HARDWARE_NAME,
+					mac_address = Utilities.get_chip_id(),
+					ip_address = WifiHandler.get_ip_address()
 				)
 
 				webSocket.SendTextMessage(ujson.dumps(identity_result))
 			elif params["command"] == "save_settings":
-				from utils.utilities import Utilities
 				from utils.json_const import save_settings_result_success, save_settings_result_failed
 				from utils.settings_template import template
 
-				params["mqtt_data_point"] = "\"" + "\", \"".join(params["mqtt_data_point"].split(",")) + "\""
 				settings = template.format(**params)
 				# print(settings)
 				with open("settings.py", "w") as file:
@@ -48,16 +41,11 @@ class WebSocketCallback(object):
 
 					if length == len(settings):
 						webSocket.SendTextMessage(ujson.dumps(save_settings_result_success))
-
-						Utilities.make_mode_file()
 					else:
 						webSocket.SendTextMessage(ujson.dumps(save_settings_result_failed))
 			elif params["command"] == "reboot_device":
-				from utils.utilities import Utilities
-
 				Utilities.hard_reset()
 			elif params["command"] == "check_wifi":
-				from utils.wifihandler import WifiHandler
 				from utils.json_const import check_wifi_result
 
 				result_code = WifiHandler.set_sta_mode(params["wifi_ssid"], params["wifi_password"], timeout_sec=60, for_test=True)
@@ -71,7 +59,6 @@ class WebSocketCallback(object):
 				if result_code == WifiHandler.STATION_CONNECTED:
 					import urequests
 					from utils.json_const import check_internet_result_success, check_internet_result_failed
-					from config import Config
 
 					try:
 						res = urequests.get(Config.INTERNET_TESTING_URL, timeout=10.0)
@@ -153,6 +140,6 @@ class WebSocketCallback(object):
 			webSocket.OnBinaryMessage = WebSocketCallback._OnWebSocketBinaryMsg
 			webSocket.OnClosed        = WebSocketCallback._OnWebSocketClosed
 
-			webSocket.SendTextMessage("hello from server")
+			# webSocket.SendTextMessage("hello from server")
 		else:
 			webSocket.Close()
