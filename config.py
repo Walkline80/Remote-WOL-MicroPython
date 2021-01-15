@@ -18,7 +18,7 @@ class Config(object):
 	# Internet 测试文件设置
 	"""
 	# 二选一，或者自己指定
-	INTERNET_TESTING_URL = "https://walkline.wang/success.html"
+	INTERNET_TESTING_URL = "http://walkline.wang/success.html"
 	# INTERNET_TESTING_URL = "https://gitee.com/walkline/WeatherStation/raw/master/success.html"
 
 	"""
