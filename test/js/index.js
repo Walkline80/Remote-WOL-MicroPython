@@ -6,15 +6,15 @@ window.onload = function () {
 
 var app = {
 	commands: {
+		IDENTITY	  : "identity",
 		CHECK_MQTT	  : "check_mqtt",
 		CHECK_WIFI	  : "check_wifi",
-		LOAD_SETTINGS : "load_settings",
 		SAVE_SETTINGS : "save_settings",
 		REBOOT_DEVICE : "reboot_device"
 	},
 
 	consts: {
-		PORT	: 80, // if you modify port number, please set the same value in config.py
+		PORT	: 80,
 		CHANNEL	: "control"
 	},
 
@@ -29,53 +29,30 @@ var app = {
 		mqtt_device_number	  : document.getElementById("mqtt_device_number"),
 		mqtt_device_authorize : document.getElementById("mqtt_device_authorize"),
 		mqtt_device_name	  : document.getElementById("mqtt_device_name"),
-		mqtt_data_point		  : document.getElementById("mqtt_data_point"),
 		output				  : document.getElementById("output"),
 
 		ws_addr				  : document.getElementById("ws_addr"),
-		button_connect			  : document.getElementById("button_connect"),
-		button_identity			  : document.getElementById("button_identity")
+		button_connect		  : document.getElementById("button_connect"),
+		button_identity		  : document.getElementById("button_identity"),
+		button_reboot		  : document.getElementById("button_reboot"),
+		button_check_wifi	  : document.getElementById("button_check_wifi"),
+		button_check_mqtt	  : document.getElementById("button_check_mqtt")
 	},
 
 	websocket: null,
 
 	init: function () {
 		this.init_buttons();
-		this.init_input();
-	},
-
-	load_settings: function () {
-		var cmd = app.commands,
-			params = {
-				command	: cmd.LOAD_SETTINGS
-			};
-
-		app.send_message(JSON.stringify(params));
-	},
-
-	init_input: function () {
-		var ctl = this.controls;
-
-		ctl.mqtt_keepalive.addEventListener("keyup", function () {
-			this.value = this.value.replace(/[^0-9]/ig, '');
-		});
-
-		ctl.mqtt_data_point.addEventListener("keyup", function () {
-			this.value = this.value.replace(/[^\w\,]/ig, '');
-		});
-
-		ctl.mqtt_username.addEventListener("blur", function () {
-			if (!isEmpty(this.value)) {
-				if (isEmpty(ctl.mqtt_device_name.value)) {
-					ctl.mqtt_device_name.value = this.value + "_";
-				}
-			}
-		});
 	},
 
 	init_buttons: function () {
-		this.controls.button_connect.addEventListener("click", this.button_connect_click);
-		this.controls.button_identity.addEventListener("click", this.button_identity_click);
+		var ctl = app.controls;
+
+		ctl.button_connect.addEventListener("click", this.button_connect_click);
+		ctl.button_identity.addEventListener("click", this.button_identity_click);
+		ctl.button_reboot.addEventListener("click", this.button_reboot_click);
+		ctl.button_check_wifi.addEventListener("click", this.button_check_wifi_click);
+		ctl.button_check_mqtt.addEventListener("click", this.button_check_mqtt_click);
 	},
 
 	button_connect_click: function () {
@@ -90,23 +67,58 @@ var app = {
 	},
 
 	button_identity_click: function () {
-		var ctl	= app.controls,
+		var cmd = app.commands,
+			params = {
+				command	: cmd.IDENTITY
+			};
+
+		app.send_message(JSON.stringify(params));
+	},
+
+	button_reboot_click: function () {
+		var cmd = app.commands,
+			params = {
+				command : cmd.REBOOT_DEVICE
+			};
+
+		app.send_message(JSON.stringify(params));
+	},
+
+	button_check_wifi_click: function () {
+		var cmd = app.commands,
+			ctl = app.controls,
+			params = {
+				command : cmd.CHECK_WIFI,
+				wifi_ssid : ctl.wifi_ssid.value,
+				wifi_password : ctl.wifi_password.value
+			};
+
+		app.send_message(JSON.stringify(params));
+	},
+
+	button_check_mqtt_click: function () {
+		var ctl = app.controls,
 			cmd = app.commands,
 			params = {
-				command		  : "identity"
+				command			 : cmd.CHECK_MQTT,
+				host			 : ctl.mqtt_host.value,
+				port			 : ctl.mqtt_port.value,
+				keepalive		 : ctl.mqtt_keepalive.value,
+				path			 : ctl.mqtt_path.value,
+				username		 : ctl.mqtt_username.value,
+				device_number	 : ctl.mqtt_device_number.value,
+				device_authorize : ctl.mqtt_device_authorize.value,
+				device_name		 : ctl.mqtt_device_name.value,
 			};
 
 		app.send_message(JSON.stringify(params));
 	},
 
 	on_open: function (event) {
-		this.send_message("hello from client");
 		this.Output.append("Connected to server");
-		// this.load_settings();
 	},
 
 	on_close: function (event) {
-		console.log("Connection Closed");
 		this.Output.append("Connection Closed");
 	},
 
@@ -117,21 +129,9 @@ var app = {
 			params = JSON.parse(event.data);
 
 			switch (params.command) {
-				case "load_settings_result":
+				case "identity_result":
 					if (params.result == "success") {
-						var ctl = this.controls;
-
-						ctl.wifi_ssid.value				= params.wifi_ssid;
-						ctl.wifi_password.value			= params.wifi_password;
-						ctl.mqtt_host.value				= params.mqtt_host;
-						ctl.mqtt_port.value				= params.mqtt_port;
-						ctl.mqtt_keepalive.value		= params.mqtt_keepalive;
-						ctl.mqtt_path.value				= params.mqtt_path;
-						ctl.mqtt_username.value			= params.mqtt_username;
-						ctl.mqtt_device_number.value	= params.mqtt_device_number;
-						ctl.mqtt_device_authorize.value = params.mqtt_device_authorize;
-						ctl.mqtt_device_name.value		= params.mqtt_device_name;
-						ctl.mqtt_data_point.value		= params.mqtt_data_point;
+						this.Output.append(`Identity Success {hardware_version: ${params.hardware_version}, hardware_name: ${params.hardware_name}, mac_address: ${params.mac_address}, ip_address: ${params.ip_address}}`);
 					}
 
 					break;
@@ -163,24 +163,6 @@ var app = {
 				case "check_internet_result":
 					if (params.result == "success") {
 						this.Output.append("Check Internet Success");
-			
-						var ctl = this.controls,
-							cmd = this.commands,
-							params = {
-								command			 : cmd.CHECK_MQTT,
-								host			 : ctl.mqtt_host.value,
-								port			 : ctl.mqtt_port.value,
-								keepalive		 : ctl.mqtt_keepalive.value,
-								path			 : ctl.mqtt_path.value,
-								username		 : ctl.mqtt_username.value,
-								device_number	 : ctl.mqtt_device_number.value,
-								device_authorize : ctl.mqtt_device_authorize.value,
-								device_name		 : ctl.mqtt_device_name.value,
-								data_point		 : ctl.mqtt_data_point.value
-							};
-
-						// console.log(JSON.stringify(params));
-						app.send_message(JSON.stringify(params));
 					} else {
 						this.Output.append("Check Internet Failed");
 					}
@@ -216,17 +198,10 @@ app.Output = {
 			output = app.controls.output;
 
 		dom.style.wordWrap = "break-word";
+		dom.style.margin = "3px";
 		dom.innerHTML = msg;
 
-		output.style.height = "63px";
 		output.appendChild(dom);
 		output.scrollTop = output.scrollHeight;
-	},
-
-	clean: function () {
-		var output = app.controls.output;
-
-		output.style.height = "0";
-		output.innerHTML = "";
 	}
 }
