@@ -1,5 +1,6 @@
 identity_result = {
 	"command": "identity_result",
+	"result": "success"
 }
 
 save_settings_result_success = {
