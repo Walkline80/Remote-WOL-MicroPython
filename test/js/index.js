@@ -36,7 +36,8 @@ var app = {
 		button_identity		  : document.getElementById("button_identity"),
 		button_reboot		  : document.getElementById("button_reboot"),
 		button_check_wifi	  : document.getElementById("button_check_wifi"),
-		button_check_mqtt	  : document.getElementById("button_check_mqtt")
+		button_check_mqtt	  : document.getElementById("button_check_mqtt"),
+		button_save			  : document.getElementById("button_save")
 	},
 
 	websocket: null,
@@ -53,6 +54,7 @@ var app = {
 		ctl.button_reboot.addEventListener("click", this.button_reboot_click);
 		ctl.button_check_wifi.addEventListener("click", this.button_check_wifi_click);
 		ctl.button_check_mqtt.addEventListener("click", this.button_check_mqtt_click);
+		ctl.button_save.addEventListener("click", this.button_save_click);
 	},
 
 	button_connect_click: function () {
@@ -64,6 +66,28 @@ var app = {
 		that.websocket.onclose	 = function (event) {that.on_close(event)};
 		that.websocket.onmessage = function (event) {that.on_message(event)};
 		that.websocket.onerror	 = function (event) {that.on_error(event)};
+	},
+
+	button_save_click: function () {
+		if (app.check_blanks()) {
+			var ctl = app.controls,
+				cmd = app.commands,
+				params = {
+					command:cmd.SAVE_SETTINGS,
+					wifi_ssid			  : ctl.wifi_ssid.value,
+					wifi_password		  : ctl.wifi_password.value,
+					mqtt_host			  : ctl.mqtt_host.value,
+					mqtt_port			  : ctl.mqtt_port.value,
+					mqtt_keepalive		  : ctl.mqtt_keepalive.value,
+					mqtt_path			  : ctl.mqtt_path.value,
+					mqtt_username		  : ctl.mqtt_username.value,
+					mqtt_device_number	  : ctl.mqtt_device_number.value,
+					mqtt_device_authorize : ctl.mqtt_device_authorize.value,
+					mqtt_device_name	  : ctl.mqtt_device_name.value
+				};
+
+			app.send_message(JSON.stringify(params));
+		}
 	},
 
 	button_identity_click: function () {
@@ -182,6 +206,35 @@ var app = {
 		}
 	},
 
+	check_blanks: function () {
+		var ctl					  = app.controls,
+			wifi_ssid			  = ctl.wifi_ssid.value,
+			wifi_password		  = ctl.wifi_password.value,
+			mqtt_host			  = ctl.mqtt_host.value,
+			mqtt_port			  = ctl.mqtt_port.value,
+			mqtt_keepalive		  = ctl.mqtt_keepalive.value,
+			mqtt_path			  = ctl.mqtt_path.value,
+			mqtt_username		  = ctl.mqtt_username.value,
+			mqtt_device_number	  = ctl.mqtt_device_number.value,
+			mqtt_device_authorize = ctl.mqtt_device_authorize.value,
+			mqtt_device_name	  = ctl.mqtt_device_name.value;
+
+		if (isEmpty(wifi_ssid)) {ctl.wifi_ssid.focus(); return false;}
+		if (isEmpty(wifi_password)) {ctl.wifi_password.focus(); return false;}
+		if (isEmpty(mqtt_host)) {ctl.mqtt_host.value = "47.102.44.223";}
+		if (isEmpty(mqtt_port)) {ctl.mqtt_port.value = "1883";}
+		if (isEmpty(mqtt_keepalive)) {ctl.mqtt_keepalive.value = 120;}
+		if (isEmpty(mqtt_path)) {ctl.mqtt_path.value = "/";}
+		if (isEmpty(mqtt_username)) {ctl.mqtt_username.focus(); return false;}
+		if (isEmpty(mqtt_device_number)) {ctl.mqtt_device_number.focus(); return false;}
+		if (isEmpty(mqtt_device_authorize)) {ctl.mqtt_device_authorize.focus(); return false;}
+		if (isEmpty(mqtt_device_name)) {ctl.mqtt_device_name.focus(); return false;}
+
+		app.Output.append("Check Items Success");
+
+		return true;
+	},
+
 	on_error: function (event) {
 		console.log("error: " + event.data);
 		this.Output.append(event.data);
@@ -203,5 +256,13 @@ app.Output = {
 
 		output.appendChild(dom);
 		output.scrollTop = output.scrollHeight;
+	}
+}
+
+function isEmpty(obj) {
+	if (typeof obj == "undefined" || obj == null || obj == "") {
+		return true;
+	} else {
+		return false;
 	}
 }
