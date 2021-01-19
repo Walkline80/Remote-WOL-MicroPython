@@ -125,5 +125,6 @@ class WifiHandler(object):
 		access_point = network.WLAN(network.AP_IF)
 
 		access_point_ip = access_point.ifconfig()[0]
+		station_ip = station.ifconfig()[0]
 
-		return access_point_ip if access_point_ip != "0.0.0.0" else station.ifconfig()[0]
+		return station_ip if station_ip != "0.0.0.0" else access_point_ip
