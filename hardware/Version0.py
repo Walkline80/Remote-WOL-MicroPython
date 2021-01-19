@@ -9,8 +9,10 @@ import gc
 from .hardware_exception import HardwareException
 from services.mqtt_service import MQTTService
 from drivers.button import Button
+from config import Config
 from settings import Settings
 from utils.utilities import Utilities
+from utils.wifihandler import WifiHandler
 from utils.wol import wake_on_lan
 from micropython import alloc_emergency_exception_buf
 from machine import Timer
@@ -26,7 +28,7 @@ class HardwareConfig(object):
 	WIFI_TIMER_ID = 6
 	WIFI_TIMER_PERIOD = 5 * 60 * 1000
 
-	MY_TOPIC = b'{}/remote_wol_device'.format(Settings.MQTT_USERNAME)
+	MY_TOPIC = b'{}/remote_wol_device'.format(Settings.MQTT_USERNAME) # {}'.format(Settings.MQTT_USERNAME, Settings.MQTT_DEVICE_NAME)
 
 
 class Version0(object):
@@ -53,7 +55,17 @@ class Version0(object):
 	def start(self):
 		assert self.__initialized == True, HardwareException("call setup() first")
 
+		data = json.dumps({
+			'hardware_version': Config.HARDWARE_VERSION,
+			'hardware_name': Config.HARDWARE_NAME,
+			'mac_address': Utilities.get_chip_id(),
+			'ip_address': WifiHandler.get_ip_address()
+		})
+
 		self.__mqtt_client.connect()
+		self.__mqtt_client.publish(HardwareConfig.MY_TOPIC, data)
+		self.__mqtt_client.subscribe(HardwareConfig.MY_TOPIC)
+
 		self.__starting = True
 
 		self.__wifi_timer.init(
