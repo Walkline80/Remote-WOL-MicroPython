@@ -6,6 +6,7 @@ https://gitee.com/walkline/remote-wol-micropython
 from utils.utilities import Utilities
 from utils.wifihandler import WifiHandler
 from drivers.led import Led
+from drivers.button import Button
 from config import Config
 from utime import sleep
 
@@ -13,6 +14,8 @@ from utime import sleep
 forever_loop = True
 ap_server = None
 led = None
+button = None
+
 
 if __name__ == "__main__":
 	try:
@@ -50,6 +53,21 @@ if __name__ == "__main__":
 
 				led.stop()
 
+				def __button_click_cb():
+					print("button clicked")
+
+				def __button_press_cb(duration):
+					print("button pressed over {} ms".format(duration))
+					Utilities.del_settings_file()
+					Utilities.hard_reset()
+
+				button = Button(
+					pin = Config.RESET_BUTTON,
+					click_cb = __button_click_cb,
+					press_cb = __button_press_cb,
+					timeout = Config.BUTTON_PRESS_TIMEOUT
+				)
+
 				while forever_loop:
 					sleep(0.5)
 			else:
@@ -62,3 +80,4 @@ if __name__ == "__main__":
 
 		if ap_server is not None: ap_server.stop()
 		if led is not None: led.deinit()
+		if button is not None: button.deinit()
