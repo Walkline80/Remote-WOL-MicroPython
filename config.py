@@ -14,6 +14,9 @@ class Config(object):
 	HARDWARE_VERSION = VERSION_0
 	HARDWARE_NAME = "Remote WOL v0"
 
+	RESET_BUTTON = 0 # GPIO0 `BOOT Button`
+	BUTTON_PRESS_TIMEOUT = 5 * 1000 # Button long press timeout
+
 	"""
 	# Internet 测试文件设置
 	"""
