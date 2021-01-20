@@ -8,7 +8,6 @@ import json
 import gc
 from .hardware_exception import HardwareException
 from services.mqtt_service import MQTTService
-from drivers.button import Button
 from config import Config
 from settings import Settings
 from utils.utilities import Utilities
@@ -22,18 +21,14 @@ alloc_emergency_exception_buf(100)
 
 
 class HardwareConfig(object):
-	BUTTON = 0 # GPIO0 `BOOT Button`
-	BUTTON_PRESS_TIMEOUT = 5 * 1000 # Button long press timeout
-
 	WIFI_TIMER_ID = 6
 	WIFI_TIMER_PERIOD = 5 * 60 * 1000
 
-	MY_TOPIC = b'{}/remote_wol_device'.format(Settings.MQTT_USERNAME) # {}'.format(Settings.MQTT_USERNAME, Settings.MQTT_DEVICE_NAME)
+	MY_TOPIC = b'{}/remote_wol_device'.format(Settings.MQTT_USERNAME)
 
 
 class Version0(object):
 	def __init__(self):
-		self.__button = None
 		self.__mqtt_client = None
 		self.__starting = False
 		self.__initialized = False
@@ -44,12 +39,6 @@ class Version0(object):
 		初始化硬件 v0
 		"""
 		self.__mqtt_client = MQTTService(self.__sub_cb)
-		self.__button = Button(
-			pin = HardwareConfig.BUTTON,
-			press_cb = self.__button_press_cb,
-			timeout = HardwareConfig.BUTTON_PRESS_TIMEOUT,
-		)
-
 		self.__initialized = True
 
 	def start(self):
@@ -77,21 +66,12 @@ class Version0(object):
 		_thread.start_new_thread(self.__msg_timer_cb, ())
 
 	def stop(self):
-		self.__button.deinit()
-
 		try:
 			self.__mqtt_client.deinit()
 		except:
 			pass
 
 		self.__starting = False
-		self.__button = None
-
-	def __button_press_cb(self, duration):
-		print("button pressed over {} ms".format(duration))
-		
-		Utilities.del_settings_file()
-		Utilities.hard_reset()
 
 	def __publish_data(self, value):
 		data = json.dumps({
