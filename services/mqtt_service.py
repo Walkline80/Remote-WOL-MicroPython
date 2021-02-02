@@ -52,11 +52,11 @@ class MQTTService(object):
 
 	def connect(self, clean_session=True):
 		self.__client = MQTTClient(
-			Settings.MQTT_DEVICE_NAME,
+			Settings.MQTT_CLIENT_ID,
 			Settings.MQTT_HOST,
 			Settings.MQTT_PORT,
-			Settings.MQTT_DEVICE_NUMBER,
-			Settings.MQTT_DEVICE_AUTHORIZE,
+			Settings.MQTT_USERNAME,
+			Settings.MQTT_PASSWORD,
 			Settings.MQTT_KEEPALIVE,
 		)
 
@@ -73,7 +73,9 @@ class MQTTService(object):
 		print("mqtt forever loop")
 		print("now:", time())
 
-		self.__client.subscribe(b'{}/{}'.format(Settings.MQTT_USERNAME, Settings.MQTT_DEVICE_NAME))
+		username = Settings.MQTT_BIGIOT_USERNAME if bool(Settings.MQTT_IS_BIGIOT) else Settings.MQTT_CLIENT_ID
+
+		self.__client.subscribe(b'{}/{}'.format(username.encode(), Settings.MQTT_CLIENT_ID))
 
 	def disconnect(self):
 		self.__client.disconnect()
