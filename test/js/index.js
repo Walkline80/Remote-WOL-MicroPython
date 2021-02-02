@@ -24,7 +24,6 @@ var app = {
 		mqtt_host			  : document.getElementById("mqtt_host"),
 		mqtt_port			  : document.getElementById("mqtt_port"),
 		mqtt_keepalive		  : document.getElementById("mqtt_keepalive"),
-		mqtt_path			  : document.getElementById("mqtt_path"),
 		mqtt_username		  : document.getElementById("mqtt_username"),
 		mqtt_device_number	  : document.getElementById("mqtt_device_number"),
 		mqtt_device_authorize : document.getElementById("mqtt_device_authorize"),
@@ -79,7 +78,6 @@ var app = {
 					mqtt_host			  : ctl.mqtt_host.value,
 					mqtt_port			  : ctl.mqtt_port.value,
 					mqtt_keepalive		  : ctl.mqtt_keepalive.value,
-					mqtt_path			  : ctl.mqtt_path.value,
 					mqtt_username		  : ctl.mqtt_username.value,
 					mqtt_device_number	  : ctl.mqtt_device_number.value,
 					mqtt_device_authorize : ctl.mqtt_device_authorize.value,
@@ -128,7 +126,6 @@ var app = {
 				host			 : ctl.mqtt_host.value,
 				port			 : ctl.mqtt_port.value,
 				keepalive		 : ctl.mqtt_keepalive.value,
-				path			 : ctl.mqtt_path.value,
 				username		 : ctl.mqtt_username.value,
 				device_number	 : ctl.mqtt_device_number.value,
 				device_authorize : ctl.mqtt_device_authorize.value,
@@ -213,7 +210,6 @@ var app = {
 			mqtt_host			  = ctl.mqtt_host.value,
 			mqtt_port			  = ctl.mqtt_port.value,
 			mqtt_keepalive		  = ctl.mqtt_keepalive.value,
-			mqtt_path			  = ctl.mqtt_path.value,
 			mqtt_username		  = ctl.mqtt_username.value,
 			mqtt_device_number	  = ctl.mqtt_device_number.value,
 			mqtt_device_authorize = ctl.mqtt_device_authorize.value,
@@ -224,7 +220,6 @@ var app = {
 		if (isEmpty(mqtt_host)) {ctl.mqtt_host.value = "47.102.44.223";}
 		if (isEmpty(mqtt_port)) {ctl.mqtt_port.value = "1883";}
 		if (isEmpty(mqtt_keepalive)) {ctl.mqtt_keepalive.value = 120;}
-		if (isEmpty(mqtt_path)) {ctl.mqtt_path.value = "/";}
 		if (isEmpty(mqtt_username)) {ctl.mqtt_username.focus(); return false;}
 		if (isEmpty(mqtt_device_number)) {ctl.mqtt_device_number.focus(); return false;}
 		if (isEmpty(mqtt_device_authorize)) {ctl.mqtt_device_authorize.focus(); return false;}
