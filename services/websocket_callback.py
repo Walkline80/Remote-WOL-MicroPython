@@ -80,19 +80,21 @@ class WebSocketCallback(object):
 					pass
 				
 				mqtt_client = MQTTClient(
-					params["device_name"],
+					params["client_id"],
 					params["host"],
 					int(params["port"]),
-					params["device_number"],
-					params["device_authorize"],
+					params["username"],
+					params["password"],
 					int(params["keepalive"])
 				)
 
 				try:
+					username = params["bigiot_username"] if bool(params["is_bigiot"]) else params["username"]
+
 					mqtt_client.set_callback(sub_cb)
 					print("check_mqtt_result:", mqtt_client.connect(True))
-					print("test subscribe:", mqtt_client.subscribe("{}/data".format(params["username"]).encode()))
-					print("test publish:", mqtt_client.publish("{}/data".format(params["username"]).encode(), "world"))
+					print("test subscribe:", mqtt_client.subscribe("{}/data".format(username).encode()))
+					print("test publish:", mqtt_client.publish("{}/data".format(username).encode(), "world"))
 					mqtt_client.disconnect()
 
 					webSocket.SendTextMessage(ujson.dumps(check_mqtt_result_success))
@@ -103,13 +105,13 @@ class WebSocketCallback(object):
 					if str(e) == "5":
 						check_mqtt_result_failed.update(
 							error_code = "5",
-							error_msg = "Authorized failed, check Device Number and Device Authorize"
+							error_msg = "Authorized failed, check Username and Password"
 						)
 					# e == 128, sub failed, means client_id or topic auth(username/data) wrong
 					elif str(e) == "128":
 						check_mqtt_result_failed.update(
 							error_code = "128",
-							error_msg = "Subscribe failed, check Username and Device Name"
+							error_msg = "Subscribe failed, check Bigiot Username and Client ID"
 						)
 					else:
 						check_mqtt_result_failed.update(
