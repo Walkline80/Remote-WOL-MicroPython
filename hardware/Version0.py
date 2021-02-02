@@ -24,7 +24,9 @@ class HardwareConfig(object):
 	WIFI_TIMER_ID = 6
 	WIFI_TIMER_PERIOD = 5 * 60 * 1000
 
-	MY_TOPIC = b'{}/remote_wol_device'.format(Settings.MQTT_USERNAME)
+	username = Settings.MQTT_BIGIOT_USERNAME if bool(Settings.MQTT_IS_BIGIOT) else Settings.MQTT_CLIENT_ID
+
+	MY_TOPIC = b'{}/remote_wol_device'.format(username)
 
 
 class Version0(object):
@@ -47,12 +49,12 @@ class Version0(object):
 		data = json.dumps({
 			'hardware_version': Config.HARDWARE_VERSION,
 			'hardware_name': Config.HARDWARE_NAME,
-			'mac_address': Utilities.get_chip_id(),
+			'mac_address': WifiHandler.get_mac_address(),
 			'ip_address': WifiHandler.get_ip_address()
 		})
 
 		self.__mqtt_client.connect()
-		self.__mqtt_client.publish(HardwareConfig.MY_TOPIC, data)
+		self.__mqtt_client.publish(HardwareConfig.MY_TOPIC, data, retain=True)
 		self.__mqtt_client.subscribe(HardwareConfig.MY_TOPIC)
 
 		self.__starting = True
@@ -117,5 +119,7 @@ class Version0(object):
 					# print("wake up pc[{}] via wol".format(params['mac']))
 			except ValueError:
 				pass
-		
+			except KeyError as ke:
+				print("KeyError:", ke)
+
 		gc.collect()
