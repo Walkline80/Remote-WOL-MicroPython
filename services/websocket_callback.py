@@ -25,7 +25,7 @@ class WebSocketCallback(object):
 				identity_result.update(
 					hardware_version = Config.HARDWARE_VERSION,
 					hardware_name = Config.HARDWARE_NAME,
-					mac_address = Utilities.get_chip_id(),
+					mac_address = WifiHandler.get_mac_address(),
 					ip_address = WifiHandler.get_ip_address()
 				)
 
@@ -89,7 +89,7 @@ class WebSocketCallback(object):
 				)
 
 				try:
-					username = params["bigiot_username"] if bool(params["is_bigiot"]) else params["username"]
+					username = params["bigiot_username"] if bool(params["is_bigiot"]) else params["client_id"]
 
 					mqtt_client.set_callback(sub_cb)
 					print("check_mqtt_result:", mqtt_client.connect(True))
