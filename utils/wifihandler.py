@@ -128,3 +128,9 @@ class WifiHandler(object):
 		station_ip = station.ifconfig()[0]
 
 		return station_ip if station_ip != "0.0.0.0" else access_point_ip
+
+	@staticmethod
+	def get_mac_address():
+		access_point = network.WLAN(network.AP_IF)
+
+		return "".join(['%02X' % i for i in access_point.config('mac')])
