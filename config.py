@@ -3,7 +3,7 @@ The MIT License (MIT)
 Copyright © 2021 Walkline Wang (https://walkline.wang)
 https://gitee.com/walkline/remote-wol-micropython
 """
-from utils.utilities import Utilities
+from utils.wifihandler import WifiHandler
 
 
 class Config(object):
@@ -32,7 +32,8 @@ class Config(object):
 	"""
 	# AP 热点设置
 	"""
-	AP_SSID = "wol_{}".format(Utilities.get_chip_id())
+	AP_SSID_PREFIX = "wol_"
+	AP_SSID = "{}{}".format(AP_SSID_PREFIX, WifiHandler.get_mac_address())
 	AP_AUTHMODE = 0
 	AP_HOST = "192.168.66.1"
 	AP_PORT = 80
