@@ -51,7 +51,7 @@ if __name__ == "__main__":
 				device.setup()
 				device.start()
 
-				led.stop()
+				led.customize(100, 0, 0)
 
 				def __button_click_cb():
 					print("button clicked")
