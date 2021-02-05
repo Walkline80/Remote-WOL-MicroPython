@@ -26,7 +26,7 @@ class HardwareConfig(object):
 
 	username = Settings.MQTT_BIGIOT_USERNAME if bool(Settings.MQTT_IS_BIGIOT) else Settings.MQTT_CLIENT_ID
 
-	MY_TOPIC = b'{}/remote_wol_device_{}'.format(username, WifiHandler.get_mac_address().lower())
+	MY_TOPIC = b'{}/remote_wol_device/{}'.format(username, WifiHandler.get_mac_address().lower())
 
 
 class Version0(object):
