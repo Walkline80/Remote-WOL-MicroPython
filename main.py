@@ -23,7 +23,7 @@ if __name__ == "__main__":
 			# 进入用户配网模式
 			from services.web_server import WebServer
 
-			led = Led(2)
+			led = Led(Config.INDICATE_LED)
 			led.blink_medium(0)
 
 			WifiHandler.set_ap_mode()
@@ -40,18 +40,20 @@ if __name__ == "__main__":
 			# 进入工作模式
 			from hardware import Selector
 
-			led = Led(2)
+			led = Led(Config.INDICATE_LED)
 			led.blink_fast(0)
 
 			WifiHandler.set_ap_status(False)
 			sleep(1)
 
 			if WifiHandler.STATION_CONNECTED == Utilities.connect_to_internet():
+				led.stop_all()
+
 				device = Selector.select(Config.HARDWARE_VERSION)
 				device.setup()
 				device.start()
 
-				led.customize(100, 0, 0)
+				led.customize(1000, 0, 0)
 
 				def __button_click_cb():
 					print("button clicked")
