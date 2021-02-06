@@ -17,6 +17,8 @@ class Config(object):
 	RESET_BUTTON = 0 # GPIO0 `BOOT Button`
 	BUTTON_PRESS_TIMEOUT = 5 * 1000 # Button long press timeout
 
+	INDICATE_LED = 2
+
 	"""
 	# Internet 测试文件设置
 	"""
