@@ -26,7 +26,7 @@ class HardwareConfig(object):
 
 	username = Settings.MQTT_BIGIOT_USERNAME if bool(Settings.MQTT_IS_BIGIOT) else Settings.MQTT_CLIENT_ID
 
-	MY_TOPIC = b'{}/remote_wol_device/{}'.format(username, WifiHandler.get_mac_address().lower())
+	MY_TOPIC = b'{}/remote_wol_device/{}'.format(username, WifiHandler.get_mac_address())
 
 
 class Version0(object):
@@ -46,15 +46,24 @@ class Version0(object):
 	def start(self):
 		assert self.__initialized == True, HardwareException("call setup() first")
 
-		data = json.dumps({
+		online_data = json.dumps({
+			'command': 'device_status_indicator',
+			'result': 'online',
 			'hardware_version': Config.HARDWARE_VERSION,
 			'hardware_name': Config.HARDWARE_NAME,
 			'mac_address': WifiHandler.get_mac_address(),
-			'ip_address': WifiHandler.get_ip_address()
+			'ip_address': WifiHandler.get_ip_address(),
 		})
 
+		offline_data = json.dumps({
+			'command': 'device_status_indicator',
+			'result': 'offline',
+			'mac_address': WifiHandler.get_mac_address(),
+		})
+
+		self.__mqtt_client.set_last_will(HardwareConfig.MY_TOPIC, offline_data, retain=True)
 		self.__mqtt_client.connect()
-		self.__mqtt_client.publish(HardwareConfig.MY_TOPIC, data, retain=True)
+		self.__mqtt_client.publish(HardwareConfig.MY_TOPIC, online_data, retain=True)
 		self.__mqtt_client.subscribe(HardwareConfig.MY_TOPIC)
 
 		self.__starting = True
