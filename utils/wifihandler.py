@@ -133,4 +133,4 @@ class WifiHandler(object):
 	def get_mac_address():
 		access_point = network.WLAN(network.AP_IF)
 
-		return "".join(['%02X' % i for i in access_point.config('mac')])
+		return "".join(['%02X' % i for i in access_point.config('mac')]).lower()
