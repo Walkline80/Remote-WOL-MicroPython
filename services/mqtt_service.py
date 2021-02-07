@@ -18,6 +18,15 @@ class MQTTService(object):
 		self.__heartbeat_timer = Timer(0)
 		self.__heartbeat_counter = 0
 
+		self.__client = MQTTClient(
+			Settings.MQTT_CLIENT_ID,
+			Settings.MQTT_HOST,
+			Settings.MQTT_PORT,
+			Settings.MQTT_USERNAME,
+			Settings.MQTT_PASSWORD,
+			Settings.MQTT_KEEPALIVE,
+		)
+
 	def __heartbeat_cb(self, timer):
 		self.__heartbeat_counter += 1
 
@@ -51,15 +60,6 @@ class MQTTService(object):
 		self.__heartbeat_timer = None
 
 	def connect(self, clean_session=True):
-		self.__client = MQTTClient(
-			Settings.MQTT_CLIENT_ID,
-			Settings.MQTT_HOST,
-			Settings.MQTT_PORT,
-			Settings.MQTT_USERNAME,
-			Settings.MQTT_PASSWORD,
-			Settings.MQTT_KEEPALIVE,
-		)
-
 		# mqtt_client.set_last_will(b'walkline/last_will', b'offline')
 		self.__client.set_callback(self.__sub_cb)
 		self.__client.connect(clean_session=clean_session)
@@ -75,7 +75,7 @@ class MQTTService(object):
 
 		username = Settings.MQTT_BIGIOT_USERNAME if bool(Settings.MQTT_IS_BIGIOT) else Settings.MQTT_CLIENT_ID
 
-		self.__client.subscribe(b'{}/{}'.format(username.encode(), Settings.MQTT_CLIENT_ID))
+		self.__client.subscribe(b'{}/{}'.format(username, Settings.MQTT_CLIENT_ID))
 
 	def disconnect(self):
 		self.__client.disconnect()
