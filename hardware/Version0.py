@@ -123,6 +123,21 @@ class Version0(object):
 				if json_obj['command'] == "wake_up_pc":
 					wake_on_lan(json_obj['mac'])
 					# print("wake up pc[{}] via wol".format(params['mac']))
+
+					json_obj['command'] = 'wake_up_pc_result'
+					json_obj['result'] = 'success'
+
+					self.__mqtt_client.publish(topic, json.dumps(json_obj))
+				elif json_obj['command'] == 'device_remove':
+					if json_obj['mac'] == WifiHandler.get_mac_address():
+
+						json_obj['command'] = 'device_remove_result'
+						json_obj['result'] = 'success'
+
+						self.__mqtt_client.publish(topic, json.dumps(json_obj))
+						
+						Utilities.del_settings_file()
+						Utilities.hard_reset()
 			except ValueError:
 				pass
 			except KeyError as ke:
