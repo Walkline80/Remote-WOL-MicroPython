@@ -24,9 +24,23 @@ class HardwareConfig(object):
 	WIFI_TIMER_ID = 6
 	WIFI_TIMER_PERIOD = 5 * 60 * 1000
 
-	username = Settings.MQTT_BIGIOT_USERNAME if bool(Settings.MQTT_IS_BIGIOT) else Settings.MQTT_CLIENT_ID
+	USERNAME = Settings.MQTT_BIGIOT_USERNAME if bool(Settings.MQTT_IS_BIGIOT) else Settings.MQTT_CLIENT_ID
+	MY_TOPIC = b'{}/remote_wol_device/{}'.format(USERNAME, WifiHandler.get_mac_address())
 
-	MY_TOPIC = b'{}/remote_wol_device/{}'.format(username, WifiHandler.get_mac_address())
+	DEVICE_STATUS_ONLINE_DATA = json.dumps({
+		'command': 'device_status_indicator',
+		'result': 'online',
+		'hardware_version': Config.HARDWARE_VERSION,
+		'hardware_name': Config.HARDWARE_NAME,
+		'mac_address': WifiHandler.get_mac_address(),
+		'ip_address': WifiHandler.get_ip_address(),
+	})
+
+	DEVICE_STATUS_OFFLINE_DATA = json.dumps({
+		'command': 'device_status_indicator',
+		'result': 'offline',
+		'mac_address': WifiHandler.get_mac_address(),
+	})
 
 
 class Version0(object):
@@ -46,24 +60,9 @@ class Version0(object):
 	def start(self):
 		assert self.__initialized == True, HardwareException("call setup() first")
 
-		online_data = json.dumps({
-			'command': 'device_status_indicator',
-			'result': 'online',
-			'hardware_version': Config.HARDWARE_VERSION,
-			'hardware_name': Config.HARDWARE_NAME,
-			'mac_address': WifiHandler.get_mac_address(),
-			'ip_address': WifiHandler.get_ip_address(),
-		})
-
-		offline_data = json.dumps({
-			'command': 'device_status_indicator',
-			'result': 'offline',
-			'mac_address': WifiHandler.get_mac_address(),
-		})
-
-		self.__mqtt_client.set_last_will(HardwareConfig.MY_TOPIC, offline_data, retain=True)
+		self.__mqtt_client.set_last_will(HardwareConfig.MY_TOPIC, HardwareConfig.DEVICE_STATUS_OFFLINE_DATA, retain=True)
 		self.__mqtt_client.connect()
-		self.__mqtt_client.publish(HardwareConfig.MY_TOPIC, online_data, retain=True)
+		self.__mqtt_client.publish(HardwareConfig.MY_TOPIC, HardwareConfig.DEVICE_STATUS_ONLINE_DATA, retain=True)
 		self.__mqtt_client.subscribe(HardwareConfig.MY_TOPIC)
 
 		self.__starting = True
@@ -121,10 +120,8 @@ class Version0(object):
 				json_obj = json.loads(str(msg, "utf-8"))
 
 				# {"msg": "wake_up", "params": {"mac": "112233445566"}}
-				if json_obj['msg'] == "wake_up":
-					params = json_obj['params']
-
-					wake_on_lan(params['mac'])
+				if json_obj['command'] == "wake_up_pc":
+					wake_on_lan(json_obj['mac'])
 					# print("wake up pc[{}] via wol".format(params['mac']))
 			except ValueError:
 				pass
