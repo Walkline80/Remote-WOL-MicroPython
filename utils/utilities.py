@@ -80,3 +80,15 @@ class Utilities(object):
 		from machine import reset
 
 		reset()
+
+	@staticmethod
+	def log(func, msg):
+		"""
+		记录日志到文件
+		"""
+
+		try:
+			with open('log.txt', 'a+') as log:
+				log.write('{}: {}\n'.format(func.__name__, msg))
+		except:
+			pass
