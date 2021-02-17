@@ -1,4 +1,8 @@
 """
+The MIT License (MIT)
+Copyright © 2021 Walkline Wang (https://walkline.wang)
+https://gitee.com/walkline/remote-wol-micropython
+
 Customize Led v1.0.1
 
 Author: Walkline Wang
