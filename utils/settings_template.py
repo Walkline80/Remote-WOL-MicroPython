@@ -12,6 +12,6 @@ class Settings(object):
 	MQTT_CLIENT_ID = "{mqtt_client_id}"
 	MQTT_USERNAME = "{mqtt_username}"
 	MQTT_PASSWORD = "{mqtt_password}"
-	MQTT_DATA_POINT = ({mqtt_data_point},)
+	MQTT_DATA_POINT = ("{mqtt_data_point}",)
 
 """
