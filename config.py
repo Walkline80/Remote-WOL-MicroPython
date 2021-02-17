@@ -11,13 +11,18 @@ class Config(object):
 	硬件配置文件
 	"""
 	VERSION_0 = "Version0"
-	HARDWARE_VERSION = VERSION_0
-	HARDWARE_NAME = "Remote WOL v0"
+	VERSION_1 = "Version1"
+	HARDWARE_VERSION = VERSION_1
+	HARDWARE_NAME = "Remote WOL v1"
 
 	RESET_BUTTON = 0 # GPIO0 `BOOT Button`
 	BUTTON_PRESS_TIMEOUT = 5 * 1000 # Button long press timeout
 
 	INDICATE_LED = 2
+
+	# Version1 Settings
+	DS18B20_DATALINE = 26 # GPIO26
+	DATA_TIMER_PERIOD = 5 * 60 * 1000 # update temperature data period
 
 	"""
 	# Internet 测试文件设置
