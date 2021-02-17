@@ -15,6 +15,7 @@ from utils.wifihandler import WifiHandler
 from utils.wol import wake_on_lan
 from micropython import alloc_emergency_exception_buf
 from machine import Timer
+from utime import sleep
 
 
 alloc_emergency_exception_buf(100)
@@ -115,8 +116,15 @@ class Version0(object):
 					Utilities.hard_reset()
 				else:
 					Utilities.log(self.__msg_timer_cb, err_msg)
-					raise OSError(err_msg)
-			
+					sleep(1)
+					Utilities.hard_reset()
+					# raise OSError(err_msg)
+			except Exception as e:
+				err_msg = str(e)
+				Utilities.log(self.__msg_timer_cb, err_msg)
+				sleep(1)
+				Utilities.hard_reset()
+
 			gc.collect()
 
 	def __sub_cb(self, topic, msg):
