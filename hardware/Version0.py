@@ -46,15 +46,18 @@ class HardwareConfig(object):
 class Version0(object):
 	def __init__(self):
 		self.__mqtt_client = None
+		self.__wifi_timer = None
 		self.__starting = False
 		self.__initialized = False
-		self.__wifi_timer = Timer(HardwareConfig.WIFI_TIMER_ID)
-		
+
 	def setup(self):
 		"""
 		初始化硬件 v0
 		"""
+		if self.__initialized: return
+
 		self.__mqtt_client = MQTTService(self.__sub_cb)
+		self.__wifi_timer = Timer(HardwareConfig.WIFI_TIMER_ID)
 		self.__initialized = True
 
 	def start(self):
@@ -65,17 +68,20 @@ class Version0(object):
 		self.__mqtt_client.publish(HardwareConfig.MY_TOPIC, HardwareConfig.DEVICE_STATUS_ONLINE_DATA, retain=True)
 		self.__mqtt_client.subscribe(HardwareConfig.MY_TOPIC)
 
-		self.__starting = True
-
 		self.__wifi_timer.init(
 			mode=Timer.PERIODIC,
 			period=HardwareConfig.WIFI_TIMER_PERIOD,
 			callback=self.__wifi_timer_cb
 		)
 
+		self.__starting = True
 		_thread.start_new_thread(self.__msg_timer_cb, ())
 
 	def stop(self):
+		if self.__starting: return
+
+		self.__wifi_timer.deinit()
+
 		try:
 			self.__mqtt_client.deinit()
 		except:
@@ -108,6 +114,7 @@ class Version0(object):
 				elif err_msg == "[Errno 113] EHOSTUNREACH":
 					Utilities.hard_reset()
 				else:
+					Utilities.log(self.__msg_timer_cb, err_msg)
 					raise OSError(err_msg)
 			
 			gc.collect()
