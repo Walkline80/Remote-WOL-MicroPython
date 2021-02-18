@@ -6,6 +6,8 @@
 
 闲的没事干，准备做一个 ESP32 开发板配合 APP 远程唤醒计算机的硬件设备，开发中。。。
 
+> 详细说明请参考 [Remote WOL 项目整体介绍](https://gitee.com/walkline/remote-wol)
+
 ### 开机棒设计思路
 
 #### 开机原理
