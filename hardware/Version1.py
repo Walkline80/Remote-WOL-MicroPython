@@ -8,13 +8,13 @@ import _thread
 import json
 import gc
 from .hardware_exception import HardwareException
+from .mqtt_sub_callback import MQTTSubCallback
 from services.mqtt_service import MQTTService
 from drivers.ds18b20 import DS18B20
 from config import Config
 from settings import Settings
 from utils.utilities import Utilities
 from utils.wifihandler import WifiHandler
-from utils.wol import wake_on_lan
 from micropython import alloc_emergency_exception_buf
 from machine import Timer
 from utime import sleep
@@ -64,7 +64,11 @@ class Version1(object):
 		"""
 		if self.__initialized: return
 
-		self.__mqtt_client = MQTTService(self.__sub_cb)
+		self.__mqtt_client = MQTTService()
+
+		mqtt_sub_callback = MQTTSubCallback(self.__mqtt_client, HardwareConfig.MY_TOPIC).get_callback()
+
+		self.__mqtt_client.set_callback(mqtt_sub_callback)
 		self.__ds18b20 = DS18B20(Config.DS18B20_DATALINE)
 		self.__wifi_timer = Timer(HardwareConfig.WIFI_TIMER_ID)
 		self.__data_timer = Timer(HardwareConfig.DATA_TIMER_ID)
@@ -173,36 +177,3 @@ class Version1(object):
 				Utilities.hard_reset()
 
 			gc.collect()
-
-	def __sub_cb(self, topic, msg):
-		if topic == HardwareConfig.MY_TOPIC:
-			print("msg: {}".format(msg))
-
-			try:
-				json_obj = json.loads(str(msg, "utf-8"))
-
-				# {"msg": "wake_up", "params": {"mac": "112233445566"}}
-				if json_obj['command'] == "wake_up_pc":
-					wake_on_lan(json_obj['mac'])
-					# print("wake up pc[{}] via wol".format(params['mac']))
-
-					json_obj['command'] = 'wake_up_pc_result'
-					json_obj['result'] = 'success'
-
-					self.__mqtt_client.publish(topic, json.dumps(json_obj))
-				elif json_obj['command'] == 'device_remove':
-					if json_obj['mac'] == WifiHandler.get_mac_address():
-
-						json_obj['command'] = 'device_remove_result'
-						json_obj['result'] = 'success'
-
-						self.__mqtt_client.publish(topic, json.dumps(json_obj))
-						
-						Utilities.del_settings_file()
-						Utilities.hard_reset()
-			except ValueError:
-				pass
-			except KeyError as ke:
-				print("KeyError:", ke)
-
-		gc.collect()
