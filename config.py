@@ -12,8 +12,8 @@ class Config(object):
 	"""
 	VERSION_0 = "Version0"
 	VERSION_1 = "Version1"
-	HARDWARE_VERSION = VERSION_1
-	HARDWARE_NAME = "Remote WOL v1"
+	HARDWARE_VERSION = VERSION_0
+	HARDWARE_NAME = "Remote WOL v0"
 
 	RESET_BUTTON = 0 # GPIO0 `BOOT Button`
 	BUTTON_PRESS_TIMEOUT = 5 * 1000 # Button long press timeout
