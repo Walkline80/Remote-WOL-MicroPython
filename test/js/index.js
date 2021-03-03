@@ -73,15 +73,17 @@ var app = {
 				cmd = app.commands,
 				params = {
 					command:cmd.SAVE_SETTINGS,
-					wifi_ssid			  : ctl.wifi_ssid.value,
-					wifi_password		  : ctl.wifi_password.value,
-					mqtt_host			  : ctl.mqtt_host.value,
-					mqtt_port			  : ctl.mqtt_port.value,
-					mqtt_keepalive		  : ctl.mqtt_keepalive.value,
-					mqtt_username		  : ctl.mqtt_username.value,
-					mqtt_device_number	  : ctl.mqtt_device_number.value,
-					mqtt_device_authorize : ctl.mqtt_device_authorize.value,
-					mqtt_device_name	  : ctl.mqtt_device_name.value
+					wifi_ssid			 : ctl.wifi_ssid.value,
+					wifi_password		 : ctl.wifi_password.value,
+					mqtt_host			 : ctl.mqtt_host.value,
+					mqtt_port			 : ctl.mqtt_port.value,
+					mqtt_keepalive		 : ctl.mqtt_keepalive.value,
+					mqtt_bigiot_username : ctl.mqtt_username.value,
+					mqtt_username		 : ctl.mqtt_device_number.value,
+					mqtt_password		 : ctl.mqtt_device_authorize.value,
+					mqtt_client_id		 : ctl.mqtt_device_name.value,
+					mqtt_is_bigiot		 : true,
+					mqtt_data_point		 : 'temperature'
 				};
 
 			app.send_message(JSON.stringify(params));
@@ -122,14 +124,15 @@ var app = {
 		var ctl = app.controls,
 			cmd = app.commands,
 			params = {
-				command			 : cmd.CHECK_MQTT,
-				host			 : ctl.mqtt_host.value,
-				port			 : ctl.mqtt_port.value,
-				keepalive		 : ctl.mqtt_keepalive.value,
-				username		 : ctl.mqtt_username.value,
-				device_number	 : ctl.mqtt_device_number.value,
-				device_authorize : ctl.mqtt_device_authorize.value,
-				device_name		 : ctl.mqtt_device_name.value,
+				command			: cmd.CHECK_MQTT,
+				host			: ctl.mqtt_host.value,
+				port			: ctl.mqtt_port.value,
+				keepalive		: ctl.mqtt_keepalive.value,
+				username		: ctl.mqtt_device_number.value,
+				password		: ctl.mqtt_device_authorize.value,
+				client_id		: ctl.mqtt_device_name.value,
+				bigiot_username	: ctl.mqtt_username.value,
+				is_bigiot		: true
 			};
 
 		app.send_message(JSON.stringify(params));
