@@ -24,6 +24,8 @@ class Config(object):
 	DS18B20_DATALINE = 26 # GPIO26
 	DATA_TIMER_PERIOD = 5 * 60 * 1000 # update temperature data period
 
+	LOG_FILE_LIMIT = 200 * 1024
+
 	"""
 	# Internet 测试文件设置
 	"""
