@@ -32,27 +32,34 @@ class MQTTSubCallback(object):
 
 			if command == "wake_up_pc":
 				for count in range(3):
-					wake_on_lan(json_obj['mac'])
+					wake_on_lan(json_obj['mac_address'])
 
-				json_obj['command'] = 'wake_up_pc_result'
-				json_obj['result'] = 'success'
-				self._client.publish(topic, json.dumps(json_obj))
+				result = {
+					'command': command + '_result',
+					'mac_address': json_obj['mac_address'],
+					'result': 'success'
+				}
+
+				self._client.publish(topic, json.dumps(result))
 			elif command == 'device_remove':
-				if json_obj['mac'] != WifiHandler.get_mac_address():
+				if json_obj['mac_address'] != WifiHandler.get_mac_address():
 					return
 
-				json_obj['command'] = 'device_remove_result'
-				json_obj['result'] = 'success'
-				self._client.publish(topic, json.dumps(json_obj))
+				result = {
+					'command': command + '_result',
+					'mac_address': json_obj['mac_address'],
+					'result': 'success'
+				}
+
+				self._client.publish(topic, json.dumps(result))
 				
 				Utilities.del_settings_file()
 				Utilities.hard_reset()
 			elif command == 'sync_datetime':
-				if json_obj['mac'] == WifiHandler.get_mac_address():
+				if json_obj['mac_address'] != WifiHandler.get_mac_address():
 					return
 
 				datetime = json_obj['datetime']
-
 				RTC().datetime((
 					datetime['year'],
 					datetime['month'],
@@ -64,13 +71,32 @@ class MQTTSubCallback(object):
 					datetime['millisecond']
 				))
 
-				json_obj['command'] = 'sync_datetime_result'
-				json_obj['result'] = 'success'
-				self._client.publish(topic, json.dumps(json_obj))
+				result = {
+					'command': command + '_result',
+					'mac_address': json_obj['mac_address'],
+					'result': 'success'
+				}
+
+				self._client.publish(topic, json.dumps(result))
 
 				print("datetime: %02d-%02d-%02d %02d:%02d:%02d" % ((localtime()[:-2])))
 			elif command == 'device_reboot':
+				if json_obj['mac_address'] != WifiHandler.get_mac_address():
+					return
+
 				Utilities.hard_reset()
+			elif command == 'report_error_log':
+				if json_obj['mac_address'] != WifiHandler.get_mac_address():
+					return
+
+				result = {
+					'command': command + '_result',
+					'mac_address': json_obj['mac_address'],
+					'logs': Utilities.read_logs(),
+					'result': 'success'
+				}
+
+				self._client.publish(topic, json.dumps(result))
 		except ValueError:
 			pass
 		except KeyError as ke:
