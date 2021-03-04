@@ -43,6 +43,21 @@ if __name__ == "__main__":
 			led = Led(Config.INDICATE_LED)
 			led.blink_fast(0)
 
+			def __button_click_cb():
+				print("button clicked")
+
+			def __button_press_cb(duration):
+				print("button pressed over {} ms".format(duration))
+				Utilities.del_settings_file()
+				Utilities.hard_reset()
+
+			button = Button(
+				pin = Config.RESET_BUTTON,
+				click_cb = __button_click_cb,
+				press_cb = __button_press_cb,
+				timeout = Config.BUTTON_PRESS_TIMEOUT
+			)
+
 			WifiHandler.set_ap_status(False)
 			sleep(1)
 
@@ -54,21 +69,6 @@ if __name__ == "__main__":
 				device.start()
 
 				led.customize(1000, 0, 0)
-
-				def __button_click_cb():
-					print("button clicked")
-
-				def __button_press_cb(duration):
-					print("button pressed over {} ms".format(duration))
-					Utilities.del_settings_file()
-					Utilities.hard_reset()
-
-				button = Button(
-					pin = Config.RESET_BUTTON,
-					click_cb = __button_click_cb,
-					press_cb = __button_press_cb,
-					timeout = Config.BUTTON_PRESS_TIMEOUT
-				)
 
 				while forever_loop:
 					sleep(0.5)
