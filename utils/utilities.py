@@ -5,29 +5,24 @@ https://gitee.com/walkline/remote-wol-micropython
 """
 class Utilities(object):
 	@staticmethod
-	def get_chip_id():
-		from machine import unique_id
-
-		return "".join(['%02X' % i for i in unique_id()])
-
-	@classmethod
-	def connect_to_internet(cls, timeout_sec=600):
-		from utils.wifihandler import WifiHandler
+	def connect_to_internet(timeout_sec=600):
+		"""
+		使用硬件配置文件中的参数连接到 wifi 网络
+		"""
+		from .wifihandler import WifiHandler
 
 		try:
 			from settings import Settings
 		except ImportError:
-			# 至此说明 mode 文件存在，但是 settings.py 文件不存在
-			# 则需要删除 mode 文件并复位，进入配网模式
-			cls.enter_smart_config_mode()
+			raise ImportError('Cannot found settings.py file')
 
 		result_code = WifiHandler.set_sta_mode(Settings.WIFI_SSID, Settings.WIFI_PASSWORD, timeout_sec)
 
 		return result_code
 
-	@classmethod
-	def is_wifi_connected(cls):
-		from utils.wifihandler import WifiHandler
+	@staticmethod
+	def is_wifi_connected():
+		from .wifihandler import WifiHandler
 
 		station = WifiHandler.get_station()
 
@@ -66,9 +61,7 @@ class Utilities(object):
 		"""
 		a soft reset
 		"""
-
 		from sys import exit
-
 		exit()
 
 	@staticmethod
@@ -76,9 +69,7 @@ class Utilities(object):
 		"""
 		a hard reset
 		"""
-
 		from machine import reset
-
 		reset()
 
 	@staticmethod
@@ -86,9 +77,43 @@ class Utilities(object):
 		"""
 		记录日志到文件
 		"""
+		import os
+		from utime import localtime
+		from config import Config
+
+		try:
+			if os.stat('log.txt')[6] >= Config.LOG_FILE_LIMIT:
+				os.remove('log.txt')
+		except OSError:
+			pass
 
 		try:
 			with open('log.txt', 'a+') as log:
-				log.write('{}: {}\n'.format(func.__name__, msg))
+				log.write("[%02d-%02d-%02d %02d:%02d:%02d] (%s): %s\n" % ((localtime()[:-2]) + (func.__name__, msg)))
 		except:
 			pass
+
+	@staticmethod
+	def read_logs(limit=10):
+		"""
+		从日志文件末尾获取指定行数的记录
+		"""
+		import os
+
+		try:
+			filesize = os.stat('log.txt')[6]
+		except OSError:
+			return ''
+
+		with open('log.txt', 'rb') as file:
+			offset = -8
+			while -offset <= filesize:
+				file.seek(offset, 2)
+				lines = file.readlines()
+
+				if len(lines) > limit:
+					return lines[len(lines) - limit:]
+				else:
+					offset -= 2
+		
+		return lines
