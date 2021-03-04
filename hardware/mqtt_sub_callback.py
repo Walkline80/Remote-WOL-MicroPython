@@ -38,14 +38,19 @@ class MQTTSubCallback(object):
 				json_obj['result'] = 'success'
 				self._client.publish(topic, json.dumps(json_obj))
 			elif command == 'device_remove':
-				if json_obj['mac'] == WifiHandler.get_mac_address():
-					json_obj['command'] = 'device_remove_result'
-					json_obj['result'] = 'success'
-					self._client.publish(topic, json.dumps(json_obj))
-					
-					Utilities.del_settings_file()
-					Utilities.hard_reset()
+				if json_obj['mac'] != WifiHandler.get_mac_address():
+					return
+
+				json_obj['command'] = 'device_remove_result'
+				json_obj['result'] = 'success'
+				self._client.publish(topic, json.dumps(json_obj))
+				
+				Utilities.del_settings_file()
+				Utilities.hard_reset()
 			elif command == 'sync_datetime':
+				if json_obj['mac'] == WifiHandler.get_mac_address():
+					return
+
 				datetime = json_obj['datetime']
 
 				RTC().datetime((
