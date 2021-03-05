@@ -29,29 +29,22 @@ class MQTTSubCallback(object):
 		try:
 			json_obj = json.loads(str(msg, "utf-8"))
 			command = json_obj['command']
+			general_result = {
+				'command': command + '_result',
+				'mac_address': json_obj['mac_address'],
+				'result': 'success'
+			}
 
 			if command == "wake_up_pc":
 				for count in range(3):
 					wake_on_lan(json_obj['mac_address'])
 
-				result = {
-					'command': command + '_result',
-					'mac_address': json_obj['mac_address'],
-					'result': 'success'
-				}
-
-				self._client.publish(topic, json.dumps(result))
+				self._client.publish(topic, json.dumps(general_result))
 			elif command == 'device_remove':
 				if json_obj['mac_address'] != WifiHandler.get_mac_address():
 					return
 
-				result = {
-					'command': command + '_result',
-					'mac_address': json_obj['mac_address'],
-					'result': 'success'
-				}
-
-				self._client.publish(topic, json.dumps(result))
+				self._client.publish(topic, json.dumps(general_result))
 				
 				Utilities.del_settings_file()
 				Utilities.hard_reset()
@@ -71,13 +64,7 @@ class MQTTSubCallback(object):
 					datetime['millisecond']
 				))
 
-				result = {
-					'command': command + '_result',
-					'mac_address': json_obj['mac_address'],
-					'result': 'success'
-				}
-
-				self._client.publish(topic, json.dumps(result))
+				self._client.publish(topic, json.dumps(general_result))
 
 				print("datetime: %02d-%02d-%02d %02d:%02d:%02d" % ((localtime()[:-2])))
 			elif command == 'device_reboot':
@@ -89,17 +76,11 @@ class MQTTSubCallback(object):
 				if json_obj['mac_address'] != WifiHandler.get_mac_address():
 					return
 
-				result = {
-					'command': command + '_result',
-					'mac_address': json_obj['mac_address'],
-					'logs': Utilities.read_logs(),
-					'result': 'success'
-				}
-
-				self._client.publish(topic, json.dumps(result))
+				general_result['logs'] = Utilities.read_logs()
+				self._client.publish(topic, json.dumps(general_result))
 		except ValueError:
 			pass
 		except KeyError as ke:
 			print("KeyError:", ke)
 
-	gc.collect()
+		gc.collect()
