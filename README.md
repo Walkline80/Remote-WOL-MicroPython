@@ -31,6 +31,7 @@ class Config(object):
     硬件配置文件
     """
     HARDWARE_VERSION = VERSION_1
+    HARDWARE_NAME = "Remote WOL v0" # 硬件名称，用于显示
 ```
 
 ### 合作交流
