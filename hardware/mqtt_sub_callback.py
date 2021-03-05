@@ -39,6 +39,8 @@ class MQTTSubCallback(object):
 				for count in range(3):
 					wake_on_lan(json_obj['mac_address'])
 
+				general_result['title'] = json_obj['title']
+				general_result['mac_address'] = WifiHandler.get_mac_address()
 				self._client.publish(topic, json.dumps(general_result))
 			elif command == 'device_remove':
 				if json_obj['mac_address'] != WifiHandler.get_mac_address():
