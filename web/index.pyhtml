@@ -7,15 +7,15 @@
 		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 		<meta http-equiv="Cache" content="no-cache">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<link rel="icon" href="favicon.png">
 		<title>Remote WOL MicroPython</title>
-		<link rel="stylesheet" href="./css/main.css">
+
+		<style></style>
 	</head>
+
 	<body>
 		<h1>Remote WOL MicroPython</h1>
 		<div class="main">
 		</div>
 	</body>
-
-	<!-- <script src="./js/function.js"></script>
-	<script src="./js/index.js"></script> -->
 </html>
