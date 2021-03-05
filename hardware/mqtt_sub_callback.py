@@ -44,6 +44,7 @@ class MQTTSubCallback(object):
 				if json_obj['mac_address'] != WifiHandler.get_mac_address():
 					return
 
+				general_result['title'] = json_obj['title']
 				self._client.publish(topic, json.dumps(general_result))
 				
 				Utilities.del_settings_file()
