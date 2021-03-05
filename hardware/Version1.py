@@ -17,7 +17,6 @@ from utils.utilities import Utilities
 from utils.wifihandler import WifiHandler
 from micropython import alloc_emergency_exception_buf
 from machine import Timer
-from utime import sleep
 
 
 alloc_emergency_exception_buf(100)
@@ -141,14 +140,10 @@ class Version1(object):
 			elif err_msg == "[Errno 113] EHOSTUNREACH":
 				Utilities.hard_reset()
 			else:
-				Utilities.log(self.__data_timer_cb, err_msg)
-				sleep(1)
-				Utilities.hard_reset()
+				Utilities.log(self.__data_timer_cb, err_msg, self.__log_callback)
 		except Exception as e:
 			err_msg = str(e)
-			Utilities.log(self.__data_timer_cb, err_msg)
-			sleep(1)
-			Utilities.hard_reset()
+			Utilities.log(self.__data_timer_cb, err_msg, self.__log_callback)
 
 	def __wifi_timer_cb(self, timer):
 		if not Utilities.is_wifi_connected():
@@ -166,14 +161,13 @@ class Version1(object):
 				elif err_msg == "[Errno 113] EHOSTUNREACH":
 					Utilities.hard_reset()
 				else:
-					Utilities.log(self.__msg_timer_cb, err_msg)
-					sleep(1)
-					Utilities.hard_reset()
+					Utilities.log(self.__msg_timer_cb, err_msg, self.__log_callback)
 					# raise OSError(err_msg)
 			except Exception as e:
 				err_msg = str(e)
-				Utilities.log(self.__msg_timer_cb, err_msg)
-				sleep(1)
-				Utilities.hard_reset()
+				Utilities.log(self.__msg_timer_cb, err_msg, self.__log_callback)
 
 			gc.collect()
+
+	def __log_callback(self):
+		Utilities.hard_reset()
