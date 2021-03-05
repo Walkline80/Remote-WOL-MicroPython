@@ -73,7 +73,7 @@ class Utilities(object):
 		reset()
 
 	@staticmethod
-	def log(func, msg):
+	def log(func, msg, callback=None):
 		"""
 		记录日志到文件
 		"""
@@ -92,6 +92,8 @@ class Utilities(object):
 				log.write("[%02d-%02d-%02d %02d:%02d:%02d] (%s): %s\n" % ((localtime()[:-2]) + (func.__name__, msg)))
 		except:
 			pass
+
+		if callback: callback()
 
 	@staticmethod
 	def read_logs(limit=10):
