@@ -73,7 +73,7 @@ class Button(object):
 		self.__click_counter = 0 # button clicked times
 		self.__timer = None
 		self.__behavior = behavior
-		self.__timer = Timer(10)
+		self.__timer = Timer(-1)
 
 		try:
 			self.__timer.init(
