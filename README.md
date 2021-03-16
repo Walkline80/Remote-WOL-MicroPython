@@ -42,3 +42,4 @@ class Config(object):
     * [扇贝物联](https://jq.qq.com/?_wv=1027&k=yp4FrpWh)：31324057
 
 <p align="center"><img src="https://gitee.com/walkline/WeatherStation/raw/docs/images/qrcode_walkline.png" width="300px" alt="走线物联"><img src="https://gitee.com/walkline/WeatherStation/raw/docs/images/qrcode_bigiot.png" width="300px" alt="扇贝物联"></p>
+
